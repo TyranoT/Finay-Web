@@ -10,6 +10,7 @@ import { PeriodoNav } from "../ui/periodo-nav";
 import { EmptyState } from "../ui/empty-state";
 import { StatCard } from "@/features/dashboard/ui/stat-card";
 import { formatCurrency } from "@/shared/helpers/format-currency";
+import { useTopbar } from "@/shared/hook/useTopbar";
 import type { Saida } from "../types";
 
 type FiltroTipo = "todas" | "entradas" | "saidas";
@@ -97,14 +98,14 @@ export function TransacoesPage() {
   const { data: saidas, isLoading } = useSaidas(filtros);
   const deletarSaida = useDeletarSaida();
 
+  useTopbar({
+    titulo: "Lançamentos",
+    subtitulo: `Entradas e saídas de ${periodoLabel.toLowerCase()}`,
+  });
+
   const todasSaidas = saidas ?? [];
   const { entradas, saidasTotal, saldo } = calcularResumo(todasSaidas);
   const saidasFiltradas = filtrarPorTipo(todasSaidas, filtroTipo);
-
-  function abrirNova() {
-    setSaidaEditando(undefined);
-    setModalAberto(true);
-  }
 
   function abrirEditar(saida: Saida) {
     setSaidaEditando(saida);
@@ -116,6 +117,11 @@ export function TransacoesPage() {
     setSaidaEditando(undefined);
   }
 
+  function abrirNova() {
+    setSaidaEditando(undefined);
+    setModalAberto(true);
+  }
+
   function handleDeletar(uid: string) {
     if (!confirm("Excluir esta transação?")) return;
     deletarSaida.mutate(uid);
@@ -123,22 +129,14 @@ export function TransacoesPage() {
 
   return (
     <>
-      {/* Top bar */}
-      <div className="fx-topbar">
-        <div>
-          <div className="fx-greeting-h">Transações</div>
-          <div className="fx-greeting-s">Entradas e saídas do período</div>
-        </div>
-        <div className="fx-topbar-actions">
-          <PeriodoNav label={periodoLabel} onPrev={voltarMes} onNext={avancarMes} />
-          <button onClick={abrirNova} className="btn btn-primary">
-            + Nova transação
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
       <div className="fx-content col gap-5">
+        <div className="row" style={{ justifyContent: "flex-end" }}>
+          <PeriodoNav
+            label={periodoLabel}
+            onPrev={voltarMes}
+            onNext={avancarMes}
+          />
+        </div>
         {/* Stat cards */}
         <div className="row gap-4" style={{ alignItems: "stretch" }}>
           <StatCard

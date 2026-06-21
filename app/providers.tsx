@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
-import { SessionProvider, AuthProvider } from "@/global";
+import { SessionProvider, AuthProvider, GrupoProvider } from "@/global";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -12,7 +12,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
         <AuthProvider>
-          {children}
+          <GrupoProvider>
+            {children}
+          </GrupoProvider>
         </AuthProvider>
       </SessionProvider>
       <ReactQueryDevtools initialIsOpen={false} />

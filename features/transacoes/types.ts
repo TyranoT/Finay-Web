@@ -60,4 +60,5 @@ export interface FiltroSaidas {
   data_fim: string;
   pagina?: number;
   por_pagina?: number;
+  grupo_uid?: string | null;
 }

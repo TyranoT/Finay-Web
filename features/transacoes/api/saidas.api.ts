@@ -23,6 +23,7 @@ export async function fetchSaidas(
     pagina: String(filtros.pagina ?? 1),
     por_pagina: String(filtros.por_pagina ?? 50),
   });
+  if (filtros.grupo_uid) params.set("grupo_uid", filtros.grupo_uid);
 
   const result = await fetcher.get<Saida[] | { saidas: Saida[] }>(
     `/saida/listar?${params.toString()}`,
