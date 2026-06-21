@@ -14,6 +14,5 @@ export function useInvestimentos() {
     queryKey: ["investimentos", escopo.uid ?? "pessoal"],
     queryFn: () => fetchInvestimentos(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

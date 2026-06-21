@@ -15,6 +15,8 @@ export function useEditarSaida() {
       editarSaida(token, uid, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["saidas"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
+      queryClient.invalidateQueries({ queryKey: ["historico"] });
     },
   });
 }

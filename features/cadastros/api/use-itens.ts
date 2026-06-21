@@ -12,6 +12,5 @@ export function useItens() {
     queryKey: ["itens", escopo.uid ?? "pessoal"],
     queryFn: () => fetchItens(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

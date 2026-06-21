@@ -10,6 +10,5 @@ export function useMembrosGrupo(grupoUid: string | null) {
     queryKey: ["grupo-membros", grupoUid],
     queryFn: () => fetchMembrosGrupo(token, grupoUid as string),
     enabled: !!token && !!grupoUid,
-    staleTime: 60_000,
   });
 }

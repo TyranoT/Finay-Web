@@ -12,6 +12,5 @@ export function useConquistas() {
     queryKey: ["conquistas", escopo.uid ?? "pessoal"],
     queryFn: () => fetchConquistas(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

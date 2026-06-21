@@ -14,6 +14,5 @@ export function useAtivos() {
     queryKey: ["ativos", escopo.uid ?? "pessoal"],
     queryFn: () => fetchAtivos(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

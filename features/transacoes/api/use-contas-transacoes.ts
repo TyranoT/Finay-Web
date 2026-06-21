@@ -12,6 +12,5 @@ export function useContasTransacoes() {
     queryKey: ["contas"],
     queryFn: () => fetchContasTransacoes(token),
     enabled: !!token,
-    staleTime: 5 * 60 * 1000,
   });
 }

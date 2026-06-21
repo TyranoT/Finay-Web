@@ -13,6 +13,8 @@ export function useDeletarSaida() {
     mutationFn: (uid: string) => deletarSaida(token, uid),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["saidas"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
+      queryClient.invalidateQueries({ queryKey: ["historico"] });
     },
   });
 }

@@ -5,12 +5,16 @@ import {
 } from "@/shared/http/fetcher";
 import type { ContaDetalhada } from "../types";
 
+const LIST_KEYS = ["contas", "items", "data", "results", "rows", "content"];
+
 function coerce(payload: unknown): ContaDetalhada[] {
   if (Array.isArray(payload)) return payload as ContaDetalhada[];
   if (payload && typeof payload === "object") {
     const obj = payload as Record<string, unknown>;
-    for (const chave of ["contas", "items", "data"]) {
+    for (const chave of LIST_KEYS) {
       if (Array.isArray(obj[chave])) return obj[chave] as ContaDetalhada[];
+      const nested = coerce(obj[chave]);
+      if (nested.length > 0) return nested;
     }
   }
   return [];
@@ -27,17 +31,15 @@ export async function fetchContasDetalhadas(
   const params = new URLSearchParams({ pagina: "1", por_pagina: "200" });
   if (grupoUid) params.set("grupo_uid", grupoUid);
 
-  try {
-    const result = await fetcher.get<unknown>(
-      `/conta/listar?${params.toString()}`,
-      token,
-    );
-    if (result && typeof result === "object" && "errors" in result) {
-      throw new ApiResponseError(result as ResponseErrorType);
-    }
-    const wrapper = result as { data?: unknown };
-    return coerce(wrapper.data ?? result);
-  } catch {
-    return [];
+  const result = await fetcher.get<unknown>(
+    `/conta/listar?${params.toString()}`,
+    token,
+  );
+
+  if (result && typeof result === "object" && "errors" in result) {
+    throw new ApiResponseError(result as ResponseErrorType);
   }
+
+  const wrapper = result as { data?: unknown };
+  return coerce(wrapper.data ?? result);
 }

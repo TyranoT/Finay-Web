@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { useCriarSaida } from "../api/use-criar-saida";
@@ -81,7 +81,11 @@ export function TransacaoForm({ saida, onClose }: TransacaoFormProps) {
 
   const categoriasDisponiveis = categorias ? flattenCategorias(categorias, tipo) : [];
 
-  useEffect(() => { setCategoriaUid(""); }, [tipo]);
+  function handleSelecionarTipo(novoTipo: TipoTransacao) {
+    if (novoTipo === tipo) return;
+    setTipo(novoTipo);
+    setCategoriaUid("");
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -162,7 +166,7 @@ export function TransacaoForm({ saida, onClose }: TransacaoFormProps) {
             <button
               key={t}
               type="button"
-              onClick={() => setTipo(t)}
+              onClick={() => handleSelecionarTipo(t)}
               className="chip"
               style={{
                 flex: 1,

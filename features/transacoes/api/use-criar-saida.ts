@@ -14,6 +14,8 @@ export function useCriarSaida() {
     mutationFn: (body: SaidaCriar) => criarSaida(token, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["saidas"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
+      queryClient.invalidateQueries({ queryKey: ["historico"] });
     },
   });
 }

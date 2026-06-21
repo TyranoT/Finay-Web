@@ -12,6 +12,5 @@ export function usePessoas() {
     queryKey: ["pessoas", escopo.uid ?? "pessoal"],
     queryFn: () => fetchPessoas(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

@@ -1,8 +1,13 @@
+"use client";
+
 import type { Categoria } from "@/features/transacoes/types";
+import { RowActions } from "./row-actions";
 
 interface CategoriaTreeProps {
   categorias: Categoria[];
   isLoading?: boolean;
+  onEdit?: (cat: Categoria) => void;
+  onDelete?: (cat: Categoria) => void;
 }
 
 const PALETTE = [
@@ -27,12 +32,23 @@ function tagFluxo(cat: Categoria): string {
   return "Inativa";
 }
 
-function Node({ cat, idx, child }: { cat: Categoria; idx: number; child?: boolean }) {
+interface NodeProps {
+  cat: Categoria;
+  idx: number;
+  child?: boolean;
+  onEdit?: (cat: Categoria) => void;
+  onDelete?: (cat: Categoria) => void;
+}
+
+function Node({ cat, idx, child, onEdit, onDelete }: NodeProps) {
   const cor = corCategoria(idx);
   const inicial = cat.nome[0]?.toUpperCase() ?? "?";
   return (
     <>
-      <div className={`fx-tree-node${child ? " child" : ""}`}>
+      <div
+        className={`fx-tree-node fx-row-hover${child ? " child" : ""}`}
+        style={{ gridTemplateColumns: child ? "28px 1fr auto" : "36px 1fr auto" }}
+      >
         <div className="fx-tree-marker marker" style={{ background: cor }}>
           {inicial}
         </div>
@@ -40,9 +56,20 @@ function Node({ cat, idx, child }: { cat: Categoria; idx: number; child?: boolea
           <div className="fx-tree-nome">{cat.nome}</div>
           <div className="fx-tree-sub">{tagFluxo(cat)}</div>
         </div>
+        <RowActions
+          onEdit={onEdit ? () => onEdit(cat) : undefined}
+          onDelete={onDelete ? () => onDelete(cat) : undefined}
+        />
       </div>
       {cat.subcategorias?.map((sub, i) => (
-        <Node key={sub.uid} cat={sub} idx={idx + i + 1} child />
+        <Node
+          key={sub.uid}
+          cat={sub}
+          idx={idx + i + 1}
+          child
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </>
   );
@@ -51,25 +78,49 @@ function Node({ cat, idx, child }: { cat: Categoria; idx: number; child?: boolea
 function Skeleton() {
   return (
     <div className="fx-tree-node" aria-hidden="true">
-      <div style={{ width: 36, height: 36, borderRadius: 12, background: "var(--line-2)" }} />
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 12,
+          background: "var(--line-2)",
+        }}
+      />
       <div>
-        <div style={{ height: 14, width: 160, background: "var(--line-2)", borderRadius: 5, marginBottom: 6 }} />
-        <div style={{ height: 11, width: 70, background: "var(--line-2)", borderRadius: 5 }} />
+        <div
+          style={{
+            height: 14,
+            width: 160,
+            background: "var(--line-2)",
+            borderRadius: 5,
+            marginBottom: 6,
+          }}
+        />
+        <div
+          style={{
+            height: 11,
+            width: 70,
+            background: "var(--line-2)",
+            borderRadius: 5,
+          }}
+        />
       </div>
     </div>
   );
 }
 
-/**
- * Árvore de categorias com indent visual para subcategorias.
- *
- * Cada categoria-pai recebe uma cor da paleta e seu marcador colorido;
- * subcategorias herdam a hierarquia visualmente sem repetir a cor.
- */
-export function CategoriaTree({ categorias, isLoading }: CategoriaTreeProps) {
+export function CategoriaTree({
+  categorias,
+  isLoading,
+  onEdit,
+  onDelete,
+}: CategoriaTreeProps) {
   if (isLoading) {
     return (
-      <div className="card card-pad" style={{ borderRadius: 18, padding: "8px 22px" }}>
+      <div
+        className="card card-pad"
+        style={{ borderRadius: 18, padding: "8px 22px" }}
+      >
         {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} />
         ))}
@@ -98,7 +149,13 @@ export function CategoriaTree({ categorias, isLoading }: CategoriaTreeProps) {
     <div className="card card-pad" style={{ borderRadius: 18, padding: "8px 22px" }}>
       <div className="fx-tree">
         {categorias.map((cat, idx) => (
-          <Node key={cat.uid} cat={cat} idx={idx} />
+          <Node
+            key={cat.uid}
+            cat={cat}
+            idx={idx}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>

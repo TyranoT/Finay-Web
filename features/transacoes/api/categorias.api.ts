@@ -13,15 +13,7 @@ import type { Categoria } from "../types";
  * @throws {ApiResponseError} Quando a API retorna erro
  */
 export async function fetchCategorias(token: string): Promise<Categoria[]> {
-  const params = new URLSearchParams({
-    opcao_entrada: "true",
-    opcao_saida: "true",
-  });
-
-  const result = await fetcher.get<Categoria[]>(
-    `/categoria/listar?${params.toString()}`,
-    token
-  );
+  const result = await fetcher.get<Categoria[]>("/categoria/listar", token);
 
   if ("errors" in result) {
     throw new ApiResponseError(result as ResponseErrorType);

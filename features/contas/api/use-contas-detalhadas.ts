@@ -14,6 +14,5 @@ export function useContasDetalhadas() {
     queryKey: ["contas-detalhadas", escopo.uid ?? "pessoal"],
     queryFn: () => fetchContasDetalhadas(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

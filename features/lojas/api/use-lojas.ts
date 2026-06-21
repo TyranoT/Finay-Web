@@ -10,6 +10,5 @@ export function useLojas() {
     queryKey: ["lojas"],
     queryFn: () => fetchLojas(token),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

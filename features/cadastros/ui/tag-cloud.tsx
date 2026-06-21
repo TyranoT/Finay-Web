@@ -1,7 +1,16 @@
+"use client";
+
+interface TagItem {
+  uid: string;
+  nome: string;
+}
+
 interface TagCloudProps {
-  itens: Array<{ uid: string; nome: string }>;
+  itens: TagItem[];
   emptyLabel: string;
   isLoading?: boolean;
+  onEdit?: (item: TagItem) => void;
+  onDelete?: (item: TagItem) => void;
 }
 
 function Skeleton() {
@@ -26,8 +35,14 @@ function Skeleton() {
   );
 }
 
-/** Nuvem de tags neutras — usado pra lugares e itens. */
-export function TagCloud({ itens, emptyLabel, isLoading }: TagCloudProps) {
+/** Nuvem de tags neutras — usado pra lugares e itens, com ações inline. */
+export function TagCloud({
+  itens,
+  emptyLabel,
+  isLoading,
+  onEdit,
+  onDelete,
+}: TagCloudProps) {
   if (isLoading) return <Skeleton />;
 
   if (itens.length === 0) {
@@ -50,8 +65,31 @@ export function TagCloud({ itens, emptyLabel, isLoading }: TagCloudProps) {
   return (
     <div className="fx-tag-cloud">
       {itens.map((it) => (
-        <span key={it.uid} className="tag">
-          {it.nome}
+        <span key={it.uid} className="tag-wrap">
+          <button
+            type="button"
+            className="tag"
+            onClick={onEdit ? () => onEdit(it) : undefined}
+            style={{
+              cursor: onEdit ? "pointer" : "default",
+              fontFamily: "inherit",
+            }}
+          >
+            {it.nome}
+          </button>
+          {onDelete && (
+            <button
+              type="button"
+              className="fx-tag-x"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(it);
+              }}
+              aria-label={`Excluir ${it.nome}`}
+            >
+              ×
+            </button>
+          )}
         </span>
       ))}
     </div>

@@ -12,6 +12,5 @@ export function useLugares() {
     queryKey: ["lugares", escopo.uid ?? "pessoal"],
     queryFn: () => fetchLugares(token, escopo.uid),
     enabled: !!token,
-    staleTime: 60_000,
   });
 }

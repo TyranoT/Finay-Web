@@ -811,6 +811,79 @@
   color: #fff;
 }
 
+/* ── Cadastros — ações (botões inline) ───────────────────── */
+.fx-eyebrow-cta {
+  margin-left: auto;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--ink-2);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: border-color 0.12s, color 0.12s;
+}
+.fx-eyebrow-cta:hover { border-color: var(--indigo); color: var(--indigo-600); }
+.fx-eyebrow-time .fx-eyebrow-cta { letter-spacing: 0; text-transform: none; }
+
+.fx-row-actions {
+  display: inline-flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.fx-row-hover:hover .fx-row-actions,
+.fx-row-actions:focus-within { opacity: 1; }
+.fx-row-action {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-3);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.fx-row-action:hover {
+  background: var(--bg);
+  color: var(--ink);
+  border-color: var(--line-2);
+}
+.fx-row-action.danger:hover {
+  color: var(--coral);
+  border-color: var(--coral-50);
+}
+
+.fx-tag-cloud .tag-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.fx-tag-cloud .tag-wrap .fx-tag-x {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  border-radius: 99px;
+  background: var(--coral);
+  color: #fff;
+  border: 2px solid var(--surface);
+  font-size: 11px;
+  font-weight: 800;
+  display: grid; place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.fx-tag-cloud .tag-wrap:hover .fx-tag-x { opacity: 1; }
+
 /* ── Cadastros (Fase 4) ──────────────────────────────────── */
 .fx-tree { display: flex; flex-direction: column; }
 .fx-tree-node {

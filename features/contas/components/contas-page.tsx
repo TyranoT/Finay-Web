@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useTopbar } from "@/shared/hook/useTopbar";
 import { useGrupoAtivo } from "@/shared/hook/useGrupoAtivo";
 import { useContasDetalhadas } from "../api/use-contas-detalhadas";
@@ -8,6 +10,7 @@ import { ehCartao } from "../types";
 import { HeroSentenceContas } from "../ui/hero-sentence-contas";
 import { ContaTile } from "../ui/conta-tile";
 import { CartaoTile } from "../ui/cartao-tile";
+import { ContaDrawer } from "../ui/conta-drawer";
 import { SectionEyebrow } from "@/features/dashboard/ui/section-eyebrow";
 
 function SkeletonTile() {
@@ -43,13 +46,48 @@ function SkeletonTile() {
   );
 }
 
+interface ContasSectionHeaderProps {
+  label: string;
+  hint: string;
+  onNovaConta: () => void;
+}
+
+function ContasSectionHeader({
+  label,
+  hint,
+  onNovaConta,
+}: ContasSectionHeaderProps) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+      }}
+    >
+      <SectionEyebrow label={label} hint={hint} />
+      <button type="button" className="fx-eyebrow-cta" onClick={onNovaConta}>
+        <Plus aria-hidden="true" />
+        Nova conta
+      </button>
+    </div>
+  );
+}
+
 /**
  * Página Contas & cartões — frase-tese consolidada, grid de contas
  * bancárias e bloco diferenciado para cartões de crédito.
  */
 export function ContasPage() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { escopo } = useGrupoAtivo();
-  const { data: contas = [], isLoading } = useContasDetalhadas();
+  const {
+    data: contas = [],
+    error,
+    isError,
+    isLoading,
+  } = useContasDetalhadas();
   const resumo = useContasResumo(contas);
 
   const cartoes = contas.filter(ehCartao);
@@ -69,15 +107,30 @@ export function ContasPage() {
       </section>
 
       <section className="col gap-3">
-        <SectionEyebrow
+        <ContasSectionHeader
           label="Suas contas"
           hint={`${bancarias.length} ${bancarias.length === 1 ? "conta" : "contas"} bancárias`}
+          onNovaConta={() => setIsDrawerOpen(true)}
         />
         {isLoading ? (
           <div className="fx-contas-grid">
             {[1, 2, 3, 4].map((i) => (
               <SkeletonTile key={i} />
             ))}
+          </div>
+        ) : isError ? (
+          <div
+            className="card card-pad"
+            style={{
+              borderRadius: 18,
+              color: "var(--coral)",
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            {error instanceof Error
+              ? error.message
+              : "Nao foi possivel listar as contas."}
           </div>
         ) : bancarias.length === 0 ? (
           <div
@@ -135,6 +188,11 @@ export function ContasPage() {
           </div>
         )}
       </section>
+
+      <ContaDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
     </div>
   );
 }

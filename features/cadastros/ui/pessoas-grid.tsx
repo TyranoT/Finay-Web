@@ -1,8 +1,13 @@
+"use client";
+
 import type { Pessoa } from "../types";
+import { RowActions } from "./row-actions";
 
 interface PessoasGridProps {
   pessoas: Pessoa[];
   isLoading?: boolean;
+  onEdit?: (p: Pessoa) => void;
+  onDelete?: (p: Pessoa) => void;
 }
 
 const CORES = [
@@ -23,19 +28,43 @@ function inicialDoNome(nome: string): string {
   return (a + b).toUpperCase() || "?";
 }
 
-function Tile({ pessoa, idx }: { pessoa: Pessoa; idx: number }) {
+interface TileProps {
+  pessoa: Pessoa;
+  idx: number;
+  onEdit?: (p: Pessoa) => void;
+  onDelete?: (p: Pessoa) => void;
+}
+
+function Tile({ pessoa, idx, onEdit, onDelete }: TileProps) {
   const cor = CORES[idx % CORES.length];
-  const meta = pessoa.usuario_uid ? "Membro" : pessoa.email ? "Externo" : "Terceiro";
+  const meta = pessoa.usuario_uid
+    ? "Membro"
+    : pessoa.email
+      ? "Externo"
+      : "Terceiro";
   return (
-    <div className="fx-pessoa-tile">
+    <div className="fx-pessoa-tile fx-row-hover" style={{ position: "relative" }}>
       <div className="av" style={{ background: cor }}>
         {inicialDoNome(pessoa.nome)}
       </div>
-      <div style={{ minWidth: 0 }}>
-        <div className="nome" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          className="nome"
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
           {pessoa.nome}
         </div>
         <div className="meta">{meta}</div>
+      </div>
+      <div style={{ marginLeft: "auto" }}>
+        <RowActions
+          onEdit={onEdit ? () => onEdit(pessoa) : undefined}
+          onDelete={onDelete ? () => onDelete(pessoa) : undefined}
+        />
       </div>
     </div>
   );
@@ -44,16 +73,43 @@ function Tile({ pessoa, idx }: { pessoa: Pessoa; idx: number }) {
 function Skeleton() {
   return (
     <div className="fx-pessoa-tile" aria-hidden="true">
-      <div style={{ width: 36, height: 36, borderRadius: 99, background: "var(--line-2)" }} />
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 99,
+          background: "var(--line-2)",
+        }}
+      />
       <div>
-        <div style={{ height: 12, width: 100, background: "var(--line-2)", borderRadius: 4, marginBottom: 6 }} />
-        <div style={{ height: 10, width: 60, background: "var(--line-2)", borderRadius: 4 }} />
+        <div
+          style={{
+            height: 12,
+            width: 100,
+            background: "var(--line-2)",
+            borderRadius: 4,
+            marginBottom: 6,
+          }}
+        />
+        <div
+          style={{
+            height: 10,
+            width: 60,
+            background: "var(--line-2)",
+            borderRadius: 4,
+          }}
+        />
       </div>
     </div>
   );
 }
 
-export function PessoasGrid({ pessoas, isLoading }: PessoasGridProps) {
+export function PessoasGrid({
+  pessoas,
+  isLoading,
+  onEdit,
+  onDelete,
+}: PessoasGridProps) {
   if (isLoading) {
     return (
       <div className="fx-pessoa-grid">
@@ -84,7 +140,13 @@ export function PessoasGrid({ pessoas, isLoading }: PessoasGridProps) {
   return (
     <div className="fx-pessoa-grid">
       {pessoas.map((p, idx) => (
-        <Tile key={p.uid} pessoa={p} idx={idx} />
+        <Tile
+          key={p.uid}
+          pessoa={p}
+          idx={idx}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );

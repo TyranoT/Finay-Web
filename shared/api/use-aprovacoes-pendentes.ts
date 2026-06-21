@@ -13,7 +13,6 @@ export function useAprovacoesPendentes(): number {
     queryFn: () => fetchAprovacoes(token),
     enabled: !!token,
     refetchInterval: 60_000,
-    staleTime: 30_000,
   });
 
   if (!Array.isArray(data)) return 0;

@@ -12,6 +12,5 @@ export function useCategorias() {
     queryKey: ["categorias"],
     queryFn: () => fetchCategorias(token),
     enabled: !!token,
-    staleTime: 5 * 60 * 1000,
   });
 }
