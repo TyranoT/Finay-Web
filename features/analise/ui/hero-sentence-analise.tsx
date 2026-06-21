@@ -1,6 +1,6 @@
 import { formatCurrency } from "@/shared/helpers/format-currency";
 import type { AnaliseResumo } from "../hooks/use-analise-resumo";
-import type { MesAgregado } from "../api/saidas-mes.api";
+import type { MesAgregado } from "../type";
 
 const MES_LONGO = [
   "janeiro",

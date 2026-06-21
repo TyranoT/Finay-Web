@@ -1,66 +1,38 @@
 "use client";
 
 import { useMemo } from "react";
-import type { MesAgregado } from "../api/saidas-mes.api";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { MES_CURTO } from "../constants/mes_curto";
+import { EvolutionChartProps, PontoEvolucaoChart, TooltipPayloadItem } from "../type";
+import { EvolutionTooltip } from "../components/evolution-tooltip";
 
-interface EvolutionChartProps {
-  meses: MesAgregado[];
-}
-
-const VIEW_W = 700;
-const VIEW_H = 240;
-const PAD_X = 28;
-const BASE_Y = 130;
-const STEM_UP_MAX = 92;
-const STEM_DOWN_MAX = 72;
-const BAR_W = 28;
-
-function calcEscala(meses: MesAgregado[]): number {
-  let max = 1;
-  for (const m of meses) {
-    if (m.entradas > max) max = m.entradas;
-    if (m.saidas > max) max = m.saidas;
-  }
-  return max;
-}
-
-function xCenter(idx: number, totalCols: number): number {
-  const usable = VIEW_W - PAD_X * 2;
-  const colW = usable / totalCols;
-  return PAD_X + colW * idx + colW / 2;
-}
-
-interface BarProps {
-  x: number;
-  baseY: number;
-  altura: number;
-  direcao: "up" | "down";
-  cor: string;
-  realcado?: boolean;
-}
-
-function Bar({ x, baseY, altura, direcao, cor, realcado }: BarProps) {
-  const y = direcao === "up" ? baseY - altura : baseY;
-  return (
-    <rect
-      x={x - BAR_W / 2}
-      y={y}
-      width={BAR_W}
-      height={altura}
-      rx={6}
-      fill={cor}
-      opacity={realcado ? 1 : 0.78}
-    />
-  );
-}
 
 /**
- * Chart de evolução em 6 meses: barras opostas mostrando entradas (jade
- * para cima) e saídas (indigo para baixo). O mês corrente fica em tom
- * cheio, os anteriores em opacidade reduzida — guia o olho pro presente.
+ * Chart de evolução em 6 meses com barras opostas para entradas e saídas.
  */
 export function EvolutionChart({ meses }: EvolutionChartProps) {
-  const escala = useMemo(() => calcEscala(meses), [meses]);
+  const data = useMemo<PontoEvolucaoChart[]>(() => {
+    const ultimoIdx = meses.length - 1;
+
+    return meses.map((mes, idx) => ({
+      id: `${mes.ano}-${mes.mes}`,
+      rotulo: mes.rotuloCurto || MES_CURTO[mes.mes] || "",
+      entradas: Math.round(mes.entradas),
+      saidas: -Math.round(mes.saidas),
+      saldo: Math.round(mes.saldo),
+      isAtual: idx === ultimoIdx,
+    }));
+  }, [meses]);
 
   if (meses.length === 0) {
     return (
@@ -70,67 +42,61 @@ export function EvolutionChart({ meses }: EvolutionChartProps) {
     );
   }
 
-  const ultimoIdx = meses.length - 1;
-  const hValor = (v: number, direcao: "up" | "down") => {
-    if (v <= 0 || escala <= 0) return 0;
-    const limit = direcao === "up" ? STEM_UP_MAX : STEM_DOWN_MAX;
-    return Math.max(4, (v / escala) * limit);
-  };
-
   return (
-    <svg
-      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-      preserveAspectRatio="xMidYMid meet"
+    <div
       className="fx-evolution"
       role="img"
       aria-label={`Gráfico de evolução de ${meses.length} meses`}
     >
-      <line
-        x1={PAD_X}
-        y1={BASE_Y}
-        x2={VIEW_W - PAD_X}
-        y2={BASE_Y}
-        stroke="var(--line-2)"
-        strokeWidth="1"
-      />
-
-      {meses.map((m, idx) => {
-        const x = xCenter(idx, meses.length);
-        const realcado = idx === ultimoIdx;
-        return (
-          <g key={`${m.ano}-${m.mes}`}>
-            <Bar
-              x={x}
-              baseY={BASE_Y}
-              altura={hValor(m.entradas, "up")}
-              direcao="up"
-              cor="var(--jade)"
-              realcado={realcado}
-            />
-            <Bar
-              x={x}
-              baseY={BASE_Y}
-              altura={hValor(m.saidas, "down")}
-              direcao="down"
-              cor="var(--indigo)"
-              realcado={realcado}
-            />
-            <text
-              x={x}
-              y={VIEW_H - 14}
-              textAnchor="middle"
-              style={{
-                font: realcado ? "700 11px var(--mono)" : "500 11px var(--mono)",
-                fill: realcado ? "var(--ink)" : "var(--ink-4)",
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-              }}
-            >
-              {m.rotuloCurto}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          barGap={4}
+          barCategoryGap="38%"
+          margin={{ top: 18, right: 8, bottom: 4, left: 8 }}
+        >
+          <CartesianGrid
+            vertical={false}
+            stroke="var(--line)"
+            strokeDasharray="3 4"
+          />
+          <ReferenceLine y={0} stroke="var(--line-2)" strokeWidth={1} />
+          <XAxis
+            dataKey="rotulo"
+            axisLine={false}
+            tickLine={false}
+            tick={{
+              fontFamily: "var(--mono)",
+              fontSize: 11,
+              fontWeight: 500,
+              fill: "var(--ink-4)",
+            }}
+          />
+          <YAxis hide domain={["dataMin", "dataMax"]} />
+          <Tooltip
+            cursor={{ fill: "var(--indigo-50)", opacity: 0.35 }}
+            content={<EvolutionTooltip />}
+          />
+          <Bar dataKey="entradas" radius={[6, 6, 0, 0]}>
+            {data.map((ponto) => (
+              <Cell
+                key={`entradas-${ponto.id}`}
+                fill="var(--jade)"
+                opacity={ponto.isAtual ? 1 : 0.78}
+              />
+            ))}
+          </Bar>
+          <Bar dataKey="saidas" radius={[0, 0, 6, 6]}>
+            {data.map((ponto) => (
+              <Cell
+                key={`saidas-${ponto.id}`}
+                fill="var(--indigo)"
+                opacity={ponto.isAtual ? 1 : 0.78}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

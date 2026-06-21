@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { MesAgregado } from "../api/saidas-mes.api";
+import { MesAgregado } from "../type";
 
 export interface AnaliseResumo {
   mediaEntradas: number;
@@ -19,6 +19,7 @@ export interface AnaliseResumo {
  */
 export function useAnaliseResumo(meses: MesAgregado[]): AnaliseResumo {
   return useMemo(() => {
+    
     if (meses.length === 0) {
       return {
         mediaEntradas: 0,
